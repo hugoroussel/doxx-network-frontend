@@ -8,11 +8,8 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
 import router from 'next/router';
+import Blockies from 'react-blockies';
 import Navbar from '../components/navbar.js';
-
-const navigation = [
-  // { name: 'About', href: '#' },
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -21,6 +18,7 @@ function classNames(...classes) {
 export default function Home() {
   const [browserSupported, setBrowserSupported] = useState(true);
   const [address, setAddress] = useState('');
+  const [feed, setFeed] = useState([{ about: '', address: '', amount: '' }]);
 
   useEffect(async () => {
     console.log('hello');
@@ -29,7 +27,11 @@ export default function Home() {
     } else {
       setBrowserSupported(false);
     }
+    const feedres = await axios.get('http://localhost:8081/feed');
+    setFeed(feedres.data.slice(0, 5));
   }, []);
+
+  useEffect(() => {}, [feed]);
 
   async function handleClick(e) {
     e.preventDefault();
@@ -74,7 +76,7 @@ export default function Home() {
                     <h1 className="mt-4 text-4xl tracking-tight font-extrabold text-white sm:mt-5 sm:leading-none lg:mt-6 lg:text-5xl xl:text-6xl">
                       <span className="md:block">Put a Bounty On Any Ethereum Address.</span>
                       {' '}
-                      <span className="text-green-400 md:block">Or get paid for yours.</span>
+                      <span className="text-green-400 md:block">Or Get Paid for yours.</span>
                     </h1>
                     <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                       Monetize your on chain activity with Doxx. Meet cool NFT collectioners, traders and developers.
@@ -113,11 +115,33 @@ export default function Home() {
                 </div>
                 <div className="mt-16 sm:mt-24 lg:mt-0 lg:col-span-6">
                   <div className="bg-transparent from-gray-400 bg-opacity-1 bg-gradient-to-tr  sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden">
-                    <div className="px-4 py-6sm:px-10">
-                      <p className="text-xs leading-5 text-white">
-                        Experimental code. Use at your own risk.
-                      </p>
-                    </div>
+                    <p className="text-xl text-white px-4 py-4">
+                      Explore Latest Bounties
+                    </p>
+                    <ul role="list" className="divide-y divide-gray-200 px-6">
+                      {feed.map((person) => (
+                        <li key={person.address} className="py-4 flex">
+                          <Blockies
+                            seed={person.address}
+                            size={10}
+                            scale={4}
+                            color="#dfe"
+                            bgColor="#9d03fc"
+                            className="identicon"
+                          />
+                          <div className="ml-3">
+                            <p className="text-sm font-medium text-white">{person.address}</p>
+                            <p className="text-sm text-white">{person.about}</p>
+                            <p className="text-sm text-white">
+                              {person.amount}
+                              {' '}
+                              DAI
+                            </p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+
                   </div>
                 </div>
               </div>

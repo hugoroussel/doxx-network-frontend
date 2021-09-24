@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable no-console */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -120,7 +122,11 @@ export default function Home() {
                     </p>
                     <ul role="list" className="divide-y divide-gray-200 px-6">
                       {feed.map((person) => (
-                        <li key={person.address} className="py-4 flex">
+                        <li
+                          key={person.address}
+                          className="py-4 flex "
+                          onClick={() => { router.push(`/bounty/${person.address}`); }}
+                        >
                           <Blockies
                             seed={person.address}
                             size={10}
@@ -129,7 +135,7 @@ export default function Home() {
                             bgColor="#9d03fc"
                             className="identicon"
                           />
-                          <div className="ml-3">
+                          <div className="ml-3 hover:bg-purple-300">
                             <p className="text-sm font-medium text-white">{person.address}</p>
                             <p className="text-sm text-white">{person.about}</p>
                             <p className="text-sm text-white">

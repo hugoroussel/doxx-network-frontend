@@ -8,7 +8,12 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import axios from 'axios';
+
+import BigNumber from 'bignumber.js';
 import Navbar from '../components/navbar.js';
+import dnpAbi from '../abis/dnp.js';
+
+const DNP = '0xA24440D66941244270272658625Fa4df5A363477';
 
 export default function Register() {
   const [account, setAccount] = useState('');
@@ -40,6 +45,28 @@ export default function Register() {
     };
     await axios.post('http://localhost:8081/register', data);
     setStep2(true);
+  }
+
+  async function getDNPContract() {
+    console.log(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const usdcContract = new ethers.Contract(DNP, dnpAbi, provider);
+    return usdcContract;
+  }
+
+  async function registerSelfBounty() {
+    const amount = document.getElementById('bounty').value;
+    const dn = await getDNPContract();
+    const bn = new BigNumber(amount * 1e18);
+    const res = await dn.populateTransaction.registerSelfBounty(bn.toFixed());
+    res.from = await account;
+    res.chainId = 5;
+    console.log(res);
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [res],
+    });
+    console.log(txHash);
   }
   return (
     <div className="relative bg-purple-800 overflow-hidden h-screen">
@@ -144,6 +171,7 @@ export default function Register() {
                     { step2 ? (
                       <button
                         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={(e) => { e.preventDefault(); registerSelfBounty(); }}
                       >
                         2. Register the bounty
                       </button>

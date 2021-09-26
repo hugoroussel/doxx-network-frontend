@@ -1,3 +1,7 @@
+/* eslint-disable import/no-duplicates */
+/* eslint-disable import/extensions */
+/* eslint-disable no-console */
+/* eslint-disable no-alert */
 /* eslint-disable react/button-has-type */
 /* eslint-disable max-len */
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -6,68 +10,64 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* This example requires Tailwind CSS v2.0+ */
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
 import axios from 'axios';
-
+import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { getDNPContract, getSignature, registerSelfBounty } from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
-import dnpAbi from '../abis/dnp.js';
-
-const DNP = '0xA24440D66941244270272658625Fa4df5A363477';
 
 export default function Register() {
   const [account, setAccount] = useState('');
   const [step2, setStep2] = useState(false);
+  const [validEmail, setValidEmail] = useState(true);
+  const [validAmount, setValidAmount] = useState(true);
+
+  // validate email function
+  const validateEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  // validity that amount is between 10 and 1000
+  const validateAmount = (amount) => {
+    const amountNum = new BigNumber(amount);
+    return amountNum.gte(10) && amountNum.lte(1000);
+  };
 
   useEffect(async () => {
+    if (window.ethereum === undefined) {
+      return;
+    }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
   }, []);
 
   async function submitInfosToServer() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    let signature;
-    try {
-      // eslint-disable-next-line no-underscore-dangle
-      signature = await signer.signMessage(account);
-      console.log(signature);
-    } catch (error) {
-      console.log(error);
-      alert('Signature refused');
-    }
     const email = document.getElementById('email').value;
-    const about = document.getElementById('about').value;
+    if (!validateEmail(email)) {
+      setValidEmail(false);
+      return;
+    }
     const amount = document.getElementById('bounty').value;
+    if (!validateAmount(amount)) {
+      setValidAmount(false);
+      return;
+    }
+    const signature = await getSignature(window.ethereum, account);
+    const about = document.getElementById('about').value;
     const data = {
       email, address: account, signature, about, amount,
     };
-    await axios.post('http://localhost:8081/register', data);
+    await axios.post('http://localhost:8081/registerself', data);
     setStep2(true);
   }
 
-  async function getDNPContract() {
-    console.log(window.ethereum);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const usdcContract = new ethers.Contract(DNP, dnpAbi, provider);
-    return usdcContract;
+  async function registerBountyAction() {
+    const bounty = document.getElementById('bounty').value;
+    await registerSelfBounty(bounty, window.ethereum, account);
   }
 
-  async function registerSelfBounty() {
-    const amount = document.getElementById('bounty').value;
-    const dn = await getDNPContract();
-    const bn = new BigNumber(amount * 1e18);
-    const res = await dn.populateTransaction.registerSelfBounty(bn.toFixed());
-    res.from = await account;
-    res.chainId = 5;
-    console.log(res);
-    const txHash = await window.ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [res],
-    });
-    console.log(txHash);
-  }
   return (
     <div className="relative bg-purple-800 overflow-hidden h-screen">
       <Navbar />
@@ -82,11 +82,11 @@ export default function Register() {
           <div className="md:grid md:grid-cols-3 md:gap-6">
             <div className="md:col-span-1">
               <div className="px-4 sm:px-0">
-                <h3 className="text-lg font-medium leading-6 text-white">
+                <h3 className="text-3xl font-medium text-white">
                   Registering
                 </h3>
-                <p className="mt-1 text-sm text-white">
-                  This information will be displayed publicly so be careful what you share.
+                <p className="mt-2 text-lg text-white">
+                  Registering is free and easy, you set your prices!
                 </p>
               </div>
             </div>
@@ -110,8 +110,10 @@ export default function Register() {
                             id="email"
                             className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
                             placeholder="you@email.com"
+                            required
                           />
                         </div>
+                        {validEmail ? (<></>) : <div className="text-red-600 text-xs">Please enter a valid email</div>}
                         <p className="mt-2 text-sm text-gray-500">
                           We do not share your email with anyone except for those paying you.
                         </p>
@@ -128,7 +130,7 @@ export default function Register() {
                           name="about"
                           rows={3}
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                          placeholder="you@example.com"
+                          placeholder="Checkout my NFT collection on opensea : my username @coolcats"
                           defaultValue=""
                         />
                       </div>
@@ -151,8 +153,10 @@ export default function Register() {
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
                           placeholder="10"
                           defaultValue=""
+                          required
                         />
                       </div>
+                      {validAmount ? (<></>) : <div className="text-red-600 text-xs">Please enter an amount between 10 and a 1000 DAI</div>}
                       <p className="mt-2 text-sm text-gray-500">
                         How much should it cost to contact you? Minimum is 10 DAI. Maximum is 1000 DAI.
                       </p>
@@ -160,23 +164,26 @@ export default function Register() {
                   </div>
 
                   <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                    <button
-                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      onClick={(e) => { e.preventDefault(); submitInfosToServer(); }}
-                    >
-                      1. Signature of your address
-                    </button>
-
                     &nbsp;&nbsp;
                     { step2 ? (
                       <button
                         className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        onClick={(e) => { e.preventDefault(); registerSelfBounty(); }}
+                        onClick={(e) => { e.preventDefault(); registerBountyAction(); }}
                       >
                         2. Register the bounty
                       </button>
-                    ) : (<></>) }
+                    ) : (
+                      <>
+                        <button
+                          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          onClick={(e) => { e.preventDefault(); submitInfosToServer(); }}
+                        >
+                          1. Signature of your address
+                        </button>
+                      </>
+                    ) }
                   </div>
+
                 </div>
               </form>
             </div>

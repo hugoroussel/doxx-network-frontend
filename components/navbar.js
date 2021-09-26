@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
@@ -30,12 +31,10 @@ export default function Example() {
             <div className="relative flex items-center justify-between h-16">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden" />
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-                <div
-                  className="flex-shrink-0 flex items-center text-4xl text-gray-200"
-                  onClick={() => router.push('/')}
-                >
+                <br />
+                <h1 className="text-white text-3xl">
                   Doxx.Network
-                </div>
+                </h1>
                 <div className="hidden sm:block sm:ml-6">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (

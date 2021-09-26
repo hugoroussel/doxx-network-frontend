@@ -29,8 +29,12 @@ export default function Home() {
     } else {
       setBrowserSupported(false);
     }
-    const feedres = await axios.get('http://localhost:8081/feed');
-    setFeed(feedres.data.slice(0, 5));
+    try {
+      const feedres = await axios.get('http://localhost:8081/feed');
+      setFeed(feedres.data);
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
 
   useEffect(() => {}, [feed]);

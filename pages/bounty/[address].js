@@ -6,42 +6,50 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* This example requires Tailwind CSS v2.0+ */
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
 import axios from 'axios';
-import BigNumber from 'bignumber.js';
 import router, { useRouter } from 'next/router';
 import Blockies from 'react-blockies';
 import Navbar from '../../components/navbar.js';
-import erc20 from '../../abis/erc20';
+import { approveDAI, buySelfBounty } from '../../customHooks/contracts.js';
 
-const DNP = '0xA24440D66941244270272658625Fa4df5A363477';
+const DNP = '0xA70beb9330F62968b71522da6D63df78ADDF54c9';
 
 export default function Register() {
+  const pageRouter = useRouter();
   const [account, setAccount] = useState('');
+  const [sellerAddress, setSellerAddress] = useState('');
   const [step2, setStep2] = useState(false);
   const [bounty, setBounty] = useState({ address: '', amount: '', about: '' });
 
-  const pageRouter = useRouter();
-  const { address } = pageRouter.query;
-
-  // TODOs
-  async function saveEmail() {
-
+  async function approveDAIhandler() {
+    console.log(bounty, typeof bounty.amount);
+    approveDAI(bounty.amount, window.ethereum, account);
   }
 
-  async function approveDAI() {
-
-  }
-
-  async function payBounty() {
-
+  async function purchase() {
+    const buyerEmail = document.getElementById('email').value;
+    const txHash = await buySelfBounty(window.ethereum, sellerAddress, account);
+    console.log('here is the tx hash', txHash);
+    const payload = {
+      sellerAddress, buyerAddress: account, buyerEmail, txHash,
+    };
+    const res = await axios.post('http://localhost:8081/buyself', payload);
+    console.log('here is the response', res);
   }
 
   useEffect(async () => {
+    const { address } = pageRouter.query;
+    setSellerAddress(address);
     console.log('Hello this is the address', address);
     const res = await axios.post('http://localhost:8081/bounty', { address });
     console.log('Hello this is the response', res);
     setBounty(res.data[0]);
+    if (window.ethereum === undefined) {
+      return;
+    }
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account0 = accounts[0];
+    setAccount(account0);
   }, []);
 
   return (
@@ -58,7 +66,7 @@ export default function Register() {
           <div className="flex bg-purple-300 px-4 py-4">
             <div className="mr-4 flex-shrink-0 self-center">
               <Blockies
-                seed={address}
+                seed={sellerAddress}
                 size={10}
                 scale={4}
                 color="#dfe"
@@ -67,7 +75,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <h4 className="text-lg font-bold">{address}</h4>
+              <h4 className="text-lg font-bold">{sellerAddress}</h4>
               <p className="mt-1">
                 {bounty.about}
               </p>
@@ -85,8 +93,13 @@ export default function Register() {
           <div className="flex bg-purple-300 px-4 py-4">
             <div className="mr-4 self-center" />
             <div>
-              <h4 className="text-lg font-bold">Enter the email you wish to receive the address information.</h4>
-              <h4 className="text-s">You will receiver the information of this email as soon as you pay.</h4>
+              <h4 className="text-lg font-bold">Enter email address.</h4>
+              <h4 className="text-s">
+                Enter the email address on which you would like to receive this address contact information.
+                <br />
+                {' '}
+                As soon as you start streaming, they email address will be sent to you.
+              </h4>
               <br />
               <div className="mt-1">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -116,15 +129,17 @@ export default function Register() {
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                onClick={(e) => { e.preventDefault(); approveDAIhandler(); }}
               >
-                Approve DAI
+                1. Approve DAI
               </button>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               <button
                 type="button"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                onClick={(e) => { e.preventDefault(); purchase(); }}
               >
-                Start Streaming
+                2. Start Streaming
               </button>
             </center>
           </div>

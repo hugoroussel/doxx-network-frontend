@@ -10,41 +10,48 @@ import axios from 'axios';
 import router, { useRouter } from 'next/router';
 import Blockies from 'react-blockies';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
-import Navbar from '../../components/navbar.js';
-import { approveDAI, buySelfBounty } from '../../customHooks/contracts.js';
-
-const DNP = '0xA70beb9330F62968b71522da6D63df78ADDF54c9';
+import Navbar from '../../components/navbar';
+import { approveDAI, buySelfBounty } from '../../customHooks/contracts';
+import { validateEmail } from '../../utils/utils';
 
 export default function Register() {
   const pageRouter = useRouter();
   const [account, setAccount] = useState('');
   const [sellerAddress, setSellerAddress] = useState('');
   const [step2, setStep2] = useState(false);
-  const [bounty, setBounty] = useState({ address: '0x2928d49c13E9035e899d4270C8A4db70b746B3e8', amount: '120', about: 'I have a sick collection of NFTs, checkout my opensea @coolcats. Open to talk about next collections' });
+  const [bounty, setBounty] = useState({ address: '', amount: '', about: '' });
+  const [validEmail, setValidEmail] = useState(true);
 
   async function approveDAIhandler() {
-    console.log(bounty, typeof bounty.amount);
+    const buyerEmail = document.getElementById('email').value;
+    if (!validateEmail(buyerEmail)) {
+      setValidEmail(false);
+      return;
+    }
     approveDAI(bounty.amount, window.ethereum, account);
+    setStep2(true);
   }
 
   async function purchase() {
     const buyerEmail = document.getElementById('email').value;
+    if (!validateEmail(buyerEmail)) {
+      setValidEmail(false);
+      return;
+    }
     const txHash = await buySelfBounty(window.ethereum, sellerAddress, account);
-    console.log('here is the tx hash', txHash);
     const payload = {
       sellerAddress, buyerAddress: account, buyerEmail, txHash,
     };
-    const res = await axios.post('http://localhost:8081/buyself', payload);
-    console.log('here is the response', res);
+    await axios.post('http://localhost:8081/buyself', payload);
   }
 
   useEffect(async () => {
+    if (!pageRouter.isReady) return;
+
     const { address } = pageRouter.query;
     setSellerAddress(address);
-
-    console.log('Hello this is the address', address);
     const res = await axios.post('http://localhost:8081/bounty', { address });
-    console.log('Hello this is the response', res);
+    console.log(res);
     setBounty(res.data[0]);
     if (window.ethereum === undefined) {
       return;
@@ -52,7 +59,7 @@ export default function Register() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
-  }, []);
+  }, [pageRouter]);
 
   return (
     <div className="relative bg-gray-800 overflow-hidden h-screen">
@@ -144,11 +151,56 @@ export default function Register() {
                       aria-describedby="email-description"
                     />
                   </div>
-                  <p className="mt-2 text-md text-gray-50" id="email-description">
-                    You will receive the bounty details in your email.
-                  </p>
+                  {validEmail ? (
+                    <p className="mt-2 text-md text-gray-50" id="email-description">
+                      You will receive the bounty details in your email.
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-md text-red-500" id="email-description">
+                      Please enter a valid email
+                    </p>
+
+                  )}
+
                 </div>
                 <br />
+
+                <div>
+
+                  {!step2 ? (
+                    <>
+                      <button
+                        type="button"
+                        className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
+                        onClick={(e) => { e.preventDefault(); approveDAIhandler(); }}
+                      >
+                        1. Approve
+                        {' '}
+                        {bounty.amount}
+                        {' '}
+                        DAI
+                        {' '}
+                        {' '}
+                        <img
+                          className="h-5 pl-2 inline-block align-middle"
+                          src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
+                          alt="dai logo"
+                        />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
+                        onClick={(e) => { e.preventDefault(); purchase(); }}
+                      >
+                        2. Buy Bounty
+                        {' '}
+                      </button>
+                    </>
+                  )}
+                </div>
 
               </div>
             </div>

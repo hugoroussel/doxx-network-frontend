@@ -12,21 +12,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
-import { ExclamationCircleIcon } from '@heroicons/react/outline';
-import { getDNPContract, getSignature, registerSelfBounty } from '../customHooks/contracts.js';
+import { getSignature, registerSelfBounty } from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
+import { validateEmail } from '../utils/utils.js';
 
 export default function Register() {
   const [account, setAccount] = useState('');
   const [step2, setStep2] = useState(false);
   const [validEmail, setValidEmail] = useState(true);
   const [validAmount, setValidAmount] = useState(true);
-
-  // validate email function
-  const validateEmail = (email) => {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
+  const [noEthereum, setNoEthereum] = useState(false);
 
   // validity that amount is between 10 and 1000
   const validateAmount = (amount) => {
@@ -36,6 +31,7 @@ export default function Register() {
 
   useEffect(async () => {
     if (window.ethereum === undefined) {
+      setNoEthereum(true);
       return;
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -45,6 +41,10 @@ export default function Register() {
   }, []);
 
   async function submitInfosToServer() {
+    if (noEthereum) {
+      alert('No Metamask Detected');
+      return;
+    }
     const email = document.getElementById('email').value;
     if (!validateEmail(email)) {
       setValidEmail(false);
@@ -126,7 +126,7 @@ export default function Register() {
                     />
                   </div>
                   <p className="mt-2 text-md text-gray-50" id="email-description">
-                    How much to contact you and reveal your email address? Min 10 $DAI, Max 1000 $DAI.
+                    How much DAI contact you and reveal your email address? (1 DAI = 1 DAI)
                   </p>
                 </div>
 
@@ -156,11 +156,6 @@ export default function Register() {
                       className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
                       onClick={(e) => { e.preventDefault(); submitInfosToServer(); }}
                     >
-                      {
-                        // get first and last character of a string
-                        // https://stackoverflow.com/questions/8486099/javascript-get-first-and-last-character-of-a-string
-
-                      }
                       1. Signature
                       {' '}
                       {`${account.substring(0, 5)}...${account.substring(account.length - 4, account.length - 1)}`}

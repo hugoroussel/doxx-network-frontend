@@ -23,9 +23,6 @@ export default function Home() {
   const [address, setAddress] = useState('');
   const [feed, setFeed] = useState([
     { address: '0x2928d49c13E9035e899d4270C8A4db70b746B3e8', amount: '120', about: 'I have a sick collection of NFTs, checkout my opensea @coolcats. Open to talk about next collections' },
-    { address: '0x2928d49c13E9035e899d4270C8A4db70b746B3e8', amount: '120', about: 'I have a sick collection of NFTs, checkout my opensea @coolcats. Open to talk about next collections' },
-    { address: '0x2928d49c13E9035e899d4270C8A4db70b746B3e8', amount: '1200', about: 'I have a sick collection of NFTs, checkout my opensea @coolcats. Open to talk about next collections' },
-    { address: '0x2928d49c13E9035e899d4270C8A4db70b746B3e8', amount: '1200', about: 'I have a sick collection of NFTs, checkout my opensea @coolcats' },
   ]);
 
   useEffect(async () => {
@@ -120,7 +117,7 @@ export default function Home() {
                       <h2 className="text-2xl font-bold mb-2 text-white">Explore or Contact The Latest Bounties</h2>
                     </div>
                     <ul role="list" className="space-y-3 ">
-                      {feed.map((item) => (
+                      {feed.slice(0, 4).map((item) => (
                         <li
                           key={item.address}
                           className="bg-white shadow overflow-hidden rounded-md px-6 py-4 border-2 hover:border-indigo-400 border-dashed"

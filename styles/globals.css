@@ -2,3 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer components {
+
+    .btn {
+      @apply inline-flex items-center h-12 px-5 py-5 border-none shadow-md text-base font-medium rounded-md text-white transition-all duration-200 cursor-pointer;
+    }
+    .btn-primary {
+      @apply inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700
+    }
+    .btn-disabled {
+      @apply bg-gray-400 inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white cursor-wait
+    }
+}
+

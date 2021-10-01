@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-redundant-roles */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable import/no-duplicates */
 /* eslint-disable import/extensions */
 /* eslint-disable no-console */
@@ -13,21 +15,46 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { FaCrosshairs } from 'react-icons/fa';
+import { isAddress } from '../utils/utils';
 import { getSignature, registerSelfBounty } from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
 import { validateEmail } from '../utils/utils.js';
 
+const steps = [
+
+];
+
 export default function Register() {
   const [account, setAccount] = useState('');
   const [step2, setStep2] = useState(false);
-  const [validEmail, setValidEmail] = useState(true);
   const [validAmount, setValidAmount] = useState(true);
   const [noEthereum, setNoEthereum] = useState(false);
+
+  const [progress, setProgress] = useState([
+    {
+      id: 'Step 1', name: 'Signature', href: sign, status: 'current',
+    },
+    {
+      id: 'Step 2', name: 'Approve DAI', href: '#', status: 'currentdzea',
+    },
+    {
+      id: 'Step 3', name: 'Register', href: '#', status: 'currentdazd',
+    }]);
+
+  const [validEmail, setValidEmail] = useState(true);
+  const [validSeller, setValidSeller] = useState(true);
+
+  async function Signature() {
+    const email = document.getElementById('email').value;
+    const amount = document.getElementById('amount').value;
+    const about = document.getElementById('about').value;
+    console.log(email, seller, amount, about);
+  }
 
   // validity that amount is between 10 and 1000
   const validateAmount = (amount) => {
     const amountNum = new BigNumber(amount);
-    return amountNum.gte(10) && amountNum.lte(1000);
+    return amountNum.gte(1) && amountNum.lte(10000);
   };
 
   useEffect(async () => {
@@ -41,7 +68,7 @@ export default function Register() {
     localStorage.setItem('eth_address', account0);
   }, []);
 
-  async function submitInfosToServer() {
+  async function sign() {
     if (noEthereum) {
       alert('No Metamask Detected');
       return;
@@ -51,20 +78,32 @@ export default function Register() {
       setValidEmail(false);
       return;
     }
+    const seller = document.getElementById('seller').value;
+    console.log(isAddress(seller));
+    if (!isAddress(seller)) {
+      setValidSeller(false);
+      return;
+    }
     const amount = document.getElementById('bounty').value;
     if (!validateAmount(amount)) {
+      console.log('invalid amount');
       setValidAmount(false);
       return;
     }
-    const signature = await getSignature(window.ethereum, account);
-    localStorage.setItem('signature', signature);
     const about = document.getElementById('about').value;
-    const data = {
-      email, address: account, signature, about, amount,
-    };
-    await axios.post('http://localhost:8081/registerself', data);
-    setStep2(true);
+    setProgress([
+      {
+        id: 'Step 1', name: 'Signature', href: sign, status: 'done',
+      },
+      {
+        id: 'Step 2', name: 'Approve DAI', href: '#', status: 'current',
+      },
+      {
+        id: 'Step 3', name: 'Register', href: '#', status: 'done',
+      }]);
   }
+
+  useEffect(() => {}, [progress]);
 
   async function registerBountyAction() {
     const bounty = document.getElementById('bounty').value;
@@ -120,16 +159,24 @@ export default function Register() {
                   <div className="mt-1">
                     <input
                       type="text"
-                      name="address"
-                      id="address"
+                      name="seller"
+                      id="seller"
                       className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-9/12 h-10 sm:text-sm border-gray-300 rounded-md px-4"
                       placeholder="0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
                     />
                   </div>
-                  <p className="mt-2 text-md text-gray-50" id="email-description">
-                    The address you want to contact.
-                    {' '}
-                  </p>
+                  {validSeller ? (
+                    <p className="mt-2 text-md text-gray-50" id="email-description">
+                      The address you want to contact.
+                      {' '}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-md text-red-500 font-semibold" id="email-description">
+                      This does not look like a valid Ethereum address.
+                      {' '}
+                    </p>
+                  )}
+
                 </div>
 
                 <div className="pt-5">
@@ -143,8 +190,8 @@ export default function Register() {
                       id="bounty"
                       className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-7/12 h-10 sm:text-sm border-gray-300 rounded-md px-4"
                       placeholder="10"
-                      min="10"
-                      max="1000"
+                      min="1"
+                      max="10000"
                       aria-describedby="email-description"
                     />
                   </div>
@@ -163,7 +210,7 @@ export default function Register() {
                       name="about"
                       rows={3}
                       className="max-w-lg shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border border-gray-300 rounded-md px-4 py-2"
-                      placeholder="I have a sick collection of NFTs, checkout my opensea @coolcats. Open to talk about next collections"
+                      placeholder="Saw your trades on the Polygon chain, would be interested to have a talk!"
                     />
                   </div>
                   <p className="mt-2 text-md text-gray-50" id="email-description">
@@ -171,31 +218,49 @@ export default function Register() {
                   </p>
                 </div>
                 <br />
-                {!step2 ? (
-                  <>
-                    {' '}
-                    <button
-                      type="button"
-                      className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
-                      onClick={(e) => { e.preventDefault(); submitInfosToServer(); }}
-                    >
-                      1. Signature
-                      {' '}
-                      {`${account.substring(0, 5)}...${account.substring(account.length - 4, account.length - 1)}`}
-                    </button>
-                  </>
-                )
-                  : (
-                    <>
-                      <button
-                        type="button"
-                        className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t hover:from-purple-700 hover:to-indigo-400 from-pink-500 to-yellow-500"
-                        onClick={(e) => { e.preventDefault(); registerBountyAction(); }}
-                      >
-                        2. Register Bounty
-                      </button>
-                    </>
-                  )}
+                <nav aria-label="Progress">
+                  <ol role="list" className="space-y-4 md:flex md:space-y-0 md:space-x-8">
+                    {progress.map((step) => (
+                      <li key={step.name} className="md:flex-1">
+                        {step.status === 'current' ? (
+                          <div
+                            className="pl-4 py-2 flex flex-col border-l-4 border-indigo-600 md:pl-0 md:pt-4 md:pb-0 md:border-l-0 md:border-t-4"
+                            aria-current="step"
+                          >
+                            <span className="text-xs text-white font-semibold tracking-wide uppercase">{step.id}</span>
+                            <br />
+                            <button
+                              type="button"
+                              className="btn-primary"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                step.href();
+                              }}
+                            >
+                              {step.name}
+                            </button>
+                          </div>
+                        ) : (
+                          <a
+                            href={step.href}
+                            className="group pl-4 py-2 flex flex-col border-l-4 border-gray-200 hover:border-gray-300 md:pl-0 md:pt-4 md:pb-0 md:border-l-0 md:border-t-4"
+                          >
+                            <span className="text-xs text-gray-500 font-semibold tracking-wide uppercase group-hover:text-gray-700">
+                              {step.id}
+                            </span>
+                            <br />
+                            <button
+                              type="button"
+                              className="btn-disabled"
+                            >
+                              {step.name}
+                            </button>
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
               </div>
             </div>
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-duplicates */
 /* eslint-disable import/extensions */
 /* eslint-disable no-console */
@@ -12,13 +13,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
-import { isApprovedSeller } from '../customHooks/contracts.js';
+import { BadgeCheckIcon } from '@heroicons/react/outline';
+import {
+  gAllSearchBountiesBuy, gAllSelfBountiesSold, gSelfBountyAmount, isApprovedSeller,
+} from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
 import { getAccount } from '../utils/ethereum';
 
 export default function Register() {
   const [noEthereum, setNoEthereum] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [accountAddress, setAccountAddress] = useState('');
+  const [bountyAmount, setBountyAmount] = useState(0);
+  const [totalSold, setTotalSold] = useState(0);
+  const [totalSearching, setTotalSearching] = useState([]);
   useEffect(async () => {
     if (!window.ethereum) {
       setNoEthereum(true);
@@ -33,6 +41,14 @@ export default function Register() {
       setAccountAddress(address);
       const res = await isApprovedSeller(window.ethereum, address);
       console.log('this is the res', res);
+      setVerified(res);
+      const ba = await gSelfBountyAmount(window.ethereum, address);
+      setBountyAmount(parseInt(ba._hex, 16) / 1e18);
+      const ts = await gAllSelfBountiesSold(window.ethereum, address);
+      console.log('this is the ts', ts);
+      setTotalSold(ts.length);
+      const tsf = await gAllSearchBountiesBuy(window.ethereum, address);
+      setTotalSearching(tsf);
     }
   }, []);
 
@@ -44,9 +60,124 @@ export default function Register() {
         <main className="sm:mt-24">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 justify-items-center rounded-lg bg-gray-800">
 
-            <div className="bg-gray-700 overflow-hidden rounded-lg">
-              <div className="text-xl text-white text-center font-semibold">
-                {accountAddress}
+            <div className="mt-5 sm:mt-24 lg:mt-0 lg:col-span-4">
+              <div className="sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden bg-gradient-to-tr from-purple-700 to-indigo-400">
+                <div className="px-4 py-8 sm:px-10">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2 py-4 text-white text-center">Your Account</h2>
+                  </div>
+                  <ul role="list" className="space-y-3 ">
+                    <li className="text-white text-center">
+                      Address :
+                      {' '}
+                      {accountAddress}
+                    </li>
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div>
+                            You are a verified seller
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+
+                    </li>
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              Bounty Amount :
+                              {' '}
+                              {bountyAmount}
+                            </p>
+                            <img
+                              className="h-6 pl-2 inline-block"
+                              src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
+                              alt="dai logo"
+                            />
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              Number of times you sold your address :
+                              {' '}
+                              {totalSold}
+                            </p>
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              Addresses you are currently searching for :
+                              {' '}
+                              {totalSearching.length}
+                            </p>
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              People Looking for your address :
+                              {' '}
+                              {totalSearching.length}
+                            </p>
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              My Streams (people you bought)
+                              {' '}
+                              {totalSearching.length}
+                            </p>
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+                    <li className="text-white text-center">
+                      {verified
+                        ? (
+                          <div className="items-center py-2">
+                            <p className="inline-block">
+                              Update About Me
+                            </p>
+                            &nbsp;&nbsp;&nbsp;
+                            <p className="inline-block">
+                              Update Bounty
+                            </p>
+                            &nbsp;&nbsp;&nbsp;
+                            <p className="inline-block">
+                              Update Email
+                            </p>
+                          </div>
+                        )
+                        : (<div>Register your account now</div>)}
+                    </li>
+                    <li>Hello</li>
+                  </ul>
+                </div>
               </div>
             </div>
 

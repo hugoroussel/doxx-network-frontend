@@ -61,6 +61,24 @@ async function isApprovedSeller(ethereumProvider, sellerAddress) {
   return result;
 }
 
+async function gSelfBountyAmount(ethereumProvider, sellerAddress) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getSelfBountyAmount(sellerAddress);
+  return result;
+}
+
+async function gAllSelfBountiesSold(ethereumProvider, sellerAddress) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getAllSelfBountiesSold(sellerAddress);
+  return result;
+}
+
+async function gAllSearchBountiesBuy(ethereumProvider, sellerAddress) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getAllSearchBountiesBuy(sellerAddress);
+  return result;
+}
+
 // DAI CALLs
 async function getDAIContract(ethereumProvider) {
   const provider = new ethers.providers.Web3Provider(ethereumProvider);
@@ -86,4 +104,7 @@ export {
   approveDAI,
   getDNPContract, registerSelfBounty, buySelfBounty,
   isApprovedSeller,
+  gSelfBountyAmount,
+  gAllSelfBountiesSold,
+  gAllSearchBountiesBuy,
 };

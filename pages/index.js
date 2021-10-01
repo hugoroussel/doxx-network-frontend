@@ -85,6 +85,7 @@ export default function Home() {
                     <button
                       type="button"
                       className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
+                      onClick={() => { router.push('/search'); }}
                     >
                       Put a Bounty
                     </button>

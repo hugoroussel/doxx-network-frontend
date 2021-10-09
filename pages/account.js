@@ -145,7 +145,7 @@ export default function Register() {
                   {totalStreamsStarted.length === 0 ? (<p className="text-white text-center">You bought 0 addresses details</p>) : (
                     <ul role="list" className="space-y-3 py-2">
                       {totalStreamsStarted.map((item, itemIdx) => (
-                        <li className="text-white text-center py-2 p-2 border-2">
+                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500">
                           <p className="text-md text-left">
                             Stream
                             {' '}
@@ -154,7 +154,7 @@ export default function Register() {
                           <p className="text-xs py-2">{item}</p>
                           <button
                             type="button"
-                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            className="btn-secondary"
                             onClick={(e) => { e.preventDefault(); handleStopStream(item, accountAddress); }}
                           >
                             Stop Stream

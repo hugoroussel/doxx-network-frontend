@@ -7,6 +7,10 @@ import erc20Abi from '../abis/erc20.js';
 const DNP = '0xe37bc7AB8db8a062CB40d234ECF0e8b4C6520BdC';
 const DAI = '0x88271d333C72e51516B67f5567c728E702b3eeE8';
 
+function hexToInt(hexstring) {
+  return parseInt(hexstring, 16);
+}
+
 // SIGNATURE
 async function getSignature(ethereumProvider, accountAddress) {
   const provider = new ethers.providers.Web3Provider(ethereumProvider);
@@ -118,6 +122,13 @@ async function getAllAvailableBounties(ethereumProvider, account) {
   return result;
 }
 
+async function getSearchBountyAmount(ethereumProvider, sellerAddress, buyerAddress) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getSearchBountyAmount(sellerAddress, buyerAddress);
+  console.log(result);
+  return hexToInt(result._hex) / 1e18;
+}
+
 // DNP SELF SETTERS
 
 // DAI CALLs
@@ -153,4 +164,5 @@ export {
   DNP,
   registerSearchBounty,
   getAllAvailableBounties,
+  getSearchBountyAmount,
 };

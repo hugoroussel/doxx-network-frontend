@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/no-redundant-roles */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable import/no-duplicates */
@@ -17,7 +18,7 @@ import BigNumber from 'bignumber.js';
 import { FaCrosshairs } from 'react-icons/fa';
 import { isAddress } from '../utils/utils';
 import {
-  getSignature, registerSelfBounty, approveDAI, DNP, registerSearchBounty,
+  getSignature, approveDAI, registerSearchBounty,
 } from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
 import { validateEmail } from '../utils/utils.js';

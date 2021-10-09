@@ -13,8 +13,6 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import BigNumber from 'bignumber.js';
-import { BadgeCheckIcon } from '@heroicons/react/outline';
 import {
   gAllSearchBountiesBuy, gAllSelfBountiesSold, gSelfBountyAmount,
   isApprovedSeller, gAllSelfBountiesSellerForBuyer,

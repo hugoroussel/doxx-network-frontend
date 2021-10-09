@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable import/extensions */
 /* eslint-disable no-await-in-loop */
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';

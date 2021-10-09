@@ -15,10 +15,6 @@ const navigation = [
   { name: 'Check my Address', href: '/check', current: false },
 ];
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
-
 export default function Navbar() {
   return (
     <>

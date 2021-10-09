@@ -21,6 +21,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/outline';
 import Navbar from '../components/navbar.js';
 import {
+  gAllSelfBountiesSellerForBuyer,
   getAllAvailableBounties, getSearchBountyAmount,
 } from '../customHooks/contracts.js';
 
@@ -28,7 +29,10 @@ export default function Check() {
   const [bounties, setBounties] = useState([]);
   const [bountiesAmounts, setBountiesAmounts] = useState([]);
   const [account, setAccount] = useState('');
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [buyer, setBuyer] = useState('');
+  const [amount, setAmount] = useState('');
+  const [about, setAbout] = useState('');
 
   async function getSearchBounties() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -40,7 +44,7 @@ export default function Check() {
   }
 
   // useEffect(() => { getSearchBounties(); }, []);
-
+  /*
   async function handleGetBounties() {
     if (window.ethereum === undefined) {
       alert('Please install metamask');
@@ -61,6 +65,15 @@ export default function Check() {
     }
     setBountiesAmounts(temp);
   }
+*/
+
+  async function handleBuy(buyer, about, amount) {
+    setBuyer(buyer);
+    setAbout(about);
+    setAmount(amount);
+    setOpen(true);
+  }
+
   return (
     <div className="relative bg-gray-800 overflow-hidden h-screen">
       <div className="relative pt-6 pb-16 sm:pb-24">
@@ -101,12 +114,24 @@ export default function Check() {
                     </div>
                     <div className="mt-3 text-center sm:mt-5">
                       <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                        Payment successful
+                        Claiming Bounty
                       </Dialog.Title>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
-                          Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
+                          Bounty from
+                          {' '}
+                          {buyer}
                         </p>
+                        <div className="text-md py-2 inline-block">
+                          Price :
+                          {' '}
+                          {0}
+                          <img
+                            className="h-6 px-2 pb-1 inline-block"
+                            src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
+                            alt="dai logo"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -146,7 +171,7 @@ export default function Check() {
                       </button>
                     </center>
 
-                    {bounties.length === 0 ? (<p className="text-white text-center">None looking for you.</p>) : (
+                    {bounties.length === 0 ? (<p className="text-white text-center" />) : (
                       <ul role="list" className="space-y-3 py-2">
                         {bounties.map((item, itemIdx) => (
                           <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500">
@@ -176,7 +201,12 @@ export default function Check() {
                               {' '}
                               {item.buyer}
                             </p>
-                            <button className="btn-secondary">Buy</button>
+                            <button
+                              className="btn-secondary"
+                              onClick={(e) => { e.preventDefault(); handleBuy(item.buyer, item.amount, item.about); }}
+                            >
+                              Buy
+                            </button>
                           </li>
                         ))}
                       </ul>

@@ -12,13 +12,12 @@
 /* eslint-disable react/jsx-filename-extension */
 /* eslint-disable react/react-in-jsx-scope */
 /* This example requires Tailwind CSS v2.0+ */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import BigNumber from 'bignumber.js';
-import { BadgeCheckIcon } from '@heroicons/react/outline';
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/outline';
+import router from 'next/router';
 import Navbar from '../components/navbar.js';
 import {
   gAllSelfBountiesSellerForBuyer,
@@ -42,30 +41,6 @@ export default function Check() {
     console.log('this is the data', res.data);
     setBounties(res.data);
   }
-
-  // useEffect(() => { getSearchBounties(); }, []);
-  /*
-  async function handleGetBounties() {
-    if (window.ethereum === undefined) {
-      alert('Please install metamask');
-      return;
-    }
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    const account0 = accounts[0];
-
-    const res = await getAllAvailableBounties(window.ethereum, account0);
-    console.log(res.length);
-    setBounties(res);
-
-    const temp = [];
-    for (let i = 0; i < res.length; i++) {
-      const res2 = await getSearchBountyAmount(window.ethereum, account0, res[i]);
-      console.log(res2);
-      temp.push(res2);
-    }
-    setBountiesAmounts(temp);
-  }
-*/
 
   async function handleBuy(buyer, about, amount) {
     setBuyer(buyer);
@@ -203,7 +178,7 @@ export default function Check() {
                             </p>
                             <button
                               className="btn-secondary"
-                              onClick={(e) => { e.preventDefault(); handleBuy(item.buyer, item.amount, item.about); }}
+                              onClick={(e) => { e.preventDefault(); router.push(`/bounty/search/${item.buyer}`); }}
                             >
                               Buy
                             </button>

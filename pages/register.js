@@ -55,7 +55,6 @@ export default function Register() {
       return;
     }
     const signature = await getSignature(window.ethereum, account);
-    localStorage.setItem('signature', signature);
     const about = document.getElementById('about').value;
     const data = {
       email, address: account, signature, about, amount,

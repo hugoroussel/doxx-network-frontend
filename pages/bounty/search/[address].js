@@ -10,56 +10,49 @@ import axios from 'axios';
 import router, { useRouter } from 'next/router';
 import Blockies from 'react-blockies';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
-import Navbar from '../../components/navbar';
-import { approveDAI, buySelfBounty, DNP } from '../../customHooks/contracts';
-import { validateEmail } from '../../utils/utils';
+import Navbar from '../../../components/navbar';
+import {
+  approveDAI, buySelfBounty, DNP, getSignature,
+} from '../../../customHooks/contracts';
+import { validateEmail } from '../../../utils/utils';
 
-export default function Register() {
+export default function Register({ category }) {
   const pageRouter = useRouter();
+  const [bounty, setBounty] = useState([]);
   const [account, setAccount] = useState('');
   const [sellerAddress, setSellerAddress] = useState('');
   const [step2, setStep2] = useState(false);
-  const [bounty, setBounty] = useState({ address: '', amount: '', about: '' });
   const [validEmail, setValidEmail] = useState(true);
-
-  async function approveDAIhandler() {
-    const buyerEmail = document.getElementById('email').value;
-    if (!validateEmail(buyerEmail)) {
-      setValidEmail(false);
-      return;
-    }
-    approveDAI(bounty.amount, window.ethereum, account);
-    setStep2(true);
-  }
-
-  async function purchase() {
-    const buyerEmail = document.getElementById('email').value;
-    if (!validateEmail(buyerEmail)) {
-      setValidEmail(false);
-      return;
-    }
-    const txHash = await buySelfBounty(window.ethereum, sellerAddress, account);
-    const payload = {
-      sellerAddress, buyerAddress: account, buyerEmail, txHash,
-    };
-    await axios.post('http://localhost:8081/buyself', payload);
-  }
 
   useEffect(async () => {
     if (!pageRouter.isReady) return;
-
-    const { address } = pageRouter.query;
-    setSellerAddress(address);
-    const res = await axios.post('http://localhost:8081/bounty', { address });
-    console.log(res);
-    setBounty(res.data[0]);
-    if (window.ethereum === undefined) {
-      return;
-    }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
+    const { address } = pageRouter.query;
+    console.log('We got the buyer and the seller', address, account0);
+    getBounty(address, account0);
   }, [pageRouter]);
+
+  async function getBounty(buyer, seller) {
+    const payload = { buyer, seller };
+    const res = await axios.post('http://localhost:8081/get_search_bounty', payload);
+    console.log('The bounty is', res.data);
+    setBounty(res.data[res.data.length - 1]);
+  }
+
+  async function handleSign() {
+    const email = document.getElementById('email').value;
+    if (!validateEmail(email)) {
+      setValidEmail(false);
+    }
+    const signature = await getSignature(window.ethereum, account);
+    const payload = {
+      seller: account, buyer: bounty.buyer, signature, email,
+    };
+    const res = await axios.post('http://localhost:8081/buy_search', payload);
+    console.log('The response is', res);
+  }
 
   return (
     <div className="relative bg-gray-800 overflow-hidden h-screen">
@@ -72,40 +65,12 @@ export default function Register() {
             <div className="bg-gray-700 overflow-hidden rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="text-xl text-white text-center font-bold">
-                  Let's Get You in Touch
-                </div>
-                <div className="pt-5">
-
-                  <label htmlFor="email" className="block text-xl font-medium text-white y-4">
-                    Purchase this Address Details :
-                  </label>
-                  <div className="pt-5 text-white text-lg align-items-center text-center">
-                    <Blockies
-                      seed={sellerAddress}
-                      size={10}
-                      scale={5}
-                      color="#dfe"
-                      bgColor="#9d03fc"
-                      className="identicon inline-block mr-4 "
-                    />
-                    <br />
-                    <a
-                      href={`https://zapper.fi/account/${sellerAddress}`}
-                      className="text-white hover:text-gray-300 inline-block pt-2"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {sellerAddress}
-                      &nbsp;
-                      <ExternalLinkIcon className="h-8 inline-block pb-2 text-white" />
-                    </a>
-
-                  </div>
+                  Accept Bounty
                 </div>
 
                 <div className="pt-5">
                   <label htmlFor="email" className="block text-xl font-medium text-white y-4">
-                    2. About
+                    About :
                   </label>
                   <div className="mt-1">
                     <p className="mt-2 text-md text-gray-50" id="email-description">
@@ -117,7 +82,7 @@ export default function Register() {
 
                 <div className="pt-5">
                   <label htmlFor="email" className="block text-xl font-medium text-white y-4">
-                    3. Amount
+                    Amount :
                   </label>
                   <div className="mt-1 align-top">
                     <p className="mt-2 text-md inline-block text-gray-50" id="email-description">
@@ -133,13 +98,13 @@ export default function Register() {
                     />
                   </div>
                   <p className="mt-2 text-md text-gray-50" id="email-description">
-                    This amount will be streamed during a week. You can stop it at any time.
+                    This amount will be streamed during a week. The counterparty can stop it anytime if you do not reply to his messages!
                   </p>
                 </div>
 
                 <div className="pt-5">
                   <label htmlFor="email" className="block text-xl font-medium text-white y-4">
-                    4. Email Address
+                    Email Address :
                   </label>
                   <div className="mt-1">
                     <input
@@ -153,7 +118,7 @@ export default function Register() {
                   </div>
                   {validEmail ? (
                     <p className="mt-2 text-md text-gray-50" id="email-description">
-                      You will receive the address details at this mail.
+                      The bounty setter will receive this email. Please make sure it is correct and one you do not use on exchanges. Check it often, they will receive an email as soon as you accept the bounty!
                     </p>
                   ) : (
                     <p className="mt-2 text-md text-red-500" id="email-description">
@@ -172,20 +137,11 @@ export default function Register() {
                       <button
                         type="button"
                         className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-t from-purple-700 to-indigo-400 hover:from-pink-500 hover:to-yellow-500 hover:bg-indigo-700"
-                        onClick={(e) => { e.preventDefault(); approveDAIhandler(); }}
+                        onClick={(e) => { e.preventDefault(); handleSign(); }}
                       >
-                        1. Approve
+                        1. Signature
                         {' '}
-                        {bounty.amount}
-                        {' '}
-                        DAI
-                        {' '}
-                        {' '}
-                        <img
-                          className="h-5 pl-2 inline-block align-middle"
-                          src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
-                          alt="dai logo"
-                        />
+                        {`${account.substring(0, 5)}...${account.substring(account.length - 4, account.length - 1)}`}
                       </button>
                     </>
                   ) : (

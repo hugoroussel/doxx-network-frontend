@@ -16,13 +16,11 @@ import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { FaCrosshairs } from 'react-icons/fa';
 import { isAddress } from '../utils/utils';
-import { getSignature, registerSelfBounty } from '../customHooks/contracts.js';
+import {
+  getSignature, registerSelfBounty, approveDAI, DNP, registerSearchBounty,
+} from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
 import { validateEmail } from '../utils/utils.js';
-
-const steps = [
-
-];
 
 export default function Register() {
   const [account, setAccount] = useState('');
@@ -35,7 +33,7 @@ export default function Register() {
       id: 'Step 1', name: 'Signature', href: sign, status: 'current',
     },
     {
-      id: 'Step 2', name: 'Approve DAI', href: '#', status: 'currentdzea',
+      id: 'Step 2', name: 'Approve DAI', href: handleApproveDai, status: 'currentdzea',
     },
     {
       id: 'Step 3', name: 'Register', href: '#', status: 'currentdazd',
@@ -44,14 +42,6 @@ export default function Register() {
   const [validEmail, setValidEmail] = useState(true);
   const [validSeller, setValidSeller] = useState(true);
 
-  async function Signature() {
-    const email = document.getElementById('email').value;
-    const amount = document.getElementById('amount').value;
-    const about = document.getElementById('about').value;
-    console.log(email, seller, amount, about);
-  }
-
-  // validity that amount is between 10 and 1000
   const validateAmount = (amount) => {
     const amountNum = new BigNumber(amount);
     return amountNum.gte(1) && amountNum.lte(10000);
@@ -65,14 +55,46 @@ export default function Register() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
-    localStorage.setItem('eth_address', account0);
   }, []);
 
+  async function handleRegisterSelfBounty() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account0 = accounts[0];
+    const seller = document.getElementById('seller').value;
+    const amount = document.getElementById('bounty').value;
+    console.log(seller, amount);
+    registerSearchBounty(window.ethereum, amount, seller, account0);
+  }
+
+  async function handleApproveDai() {
+    const amount = document.getElementById('bounty').value;
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account0 = accounts[0];
+    approveDAI(amount, window.ethereum, account0);
+    setProgress([
+      {
+        id: 'Step 1', name: 'Signature', href: sign, status: 'done',
+      },
+      {
+        id: 'Step 2', name: 'Approve DAI', href: handleApproveDai, status: 'done',
+      },
+      {
+        id: 'Step 3', name: 'Register', href: handleRegisterSelfBounty, status: 'current',
+      }]);
+  }
+
   async function sign() {
-    if (noEthereum) {
+    console.log('Ethereum address', account);
+    if (window.ethereum === undefined) {
       alert('No Metamask Detected');
+      setNoEthereum(true);
       return;
     }
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account0 = accounts[0];
+    console.log('Ethereum address', account0);
+    setAccount(account0);
+
     const email = document.getElementById('email').value;
     if (!validateEmail(email)) {
       setValidEmail(false);
@@ -91,12 +113,22 @@ export default function Register() {
       return;
     }
     const about = document.getElementById('about').value;
+
+    const signature = await getSignature(window.ethereum, account0);
+
+    const payload = {
+      email, seller, amount, about, buyer: account0, signature,
+    };
+
+    const res = await axios.post('http://localhost:8081/register_search', payload);
+    console.log(res);
+
     setProgress([
       {
         id: 'Step 1', name: 'Signature', href: sign, status: 'done',
       },
       {
-        id: 'Step 2', name: 'Approve DAI', href: '#', status: 'current',
+        id: 'Step 2', name: 'Approve DAI', href: handleApproveDai, status: 'current',
       },
       {
         id: 'Step 3', name: 'Register', href: '#', status: 'done',
@@ -104,11 +136,6 @@ export default function Register() {
   }
 
   useEffect(() => {}, [progress]);
-
-  async function registerBountyAction() {
-    const bounty = document.getElementById('bounty').value;
-    await registerSelfBounty(bounty, window.ethereum, account);
-  }
 
   return (
     <div className="relative bg-gray-800 overflow-hidden h-screen">

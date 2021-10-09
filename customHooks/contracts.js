@@ -21,13 +21,13 @@ async function getSignature(ethereumProvider, accountAddress) {
   }
 }
 
-// DNP STATE CHANGE CALLS
 async function getDNPContract(ethereumProvider) {
   const provider = new ethers.providers.Web3Provider(ethereumProvider);
   const dnpContract = new ethers.Contract(DNP, dnpAbi, provider);
   return dnpContract;
 }
 
+// DNP SELF BOUNTIES STATE CHANGE CALLS
 async function registerSelfBounty(amount, ethereumProvider, account) {
   const dn = await getDNPContract(ethereumProvider);
   const bn = new BigNumber(amount * 1e18);
@@ -51,6 +51,33 @@ async function buySelfBounty(ethereumProvider, seller, account) {
     params: [res],
   });
   return txHash;
+}
+
+async function stopStreamSelfBounty(ethereumProvider, seller, account) {
+  const dn = await getDNPContract(ethereumProvider);
+  const res = await dn.populateTransaction.stopStreamSelfBounty(seller, account);
+  res.from = account;
+  res.chainId = 5;
+  const txHash = await ethereumProvider.request({
+    method: 'eth_sendTransaction',
+    params: [res],
+  });
+  return txHash;
+}
+
+// DNP SEARCH BOUNTIES STATE CHANGE CALLS
+
+async function registerSearchBounty(ethereumProvider, bounty, seller, buyer) {
+  const dn = await getDNPContract(ethereumProvider);
+  const bn = new BigNumber(bounty * 1e18);
+  const res = await dn.populateTransaction.registerSearchBounty(bn.toFixed(), seller);
+  res.from = buyer;
+  res.chainId = 5;
+  const txHash = await ethereumProvider.request({
+    method: 'eth_sendTransaction',
+    params: [res],
+  });
+  console.log(txHash);
 }
 
 // DNP GETTERS
@@ -78,6 +105,20 @@ async function gAllSearchBountiesBuy(ethereumProvider, sellerAddress) {
   const result = await dn.getAllSearchBountiesBuy(sellerAddress);
   return result;
 }
+
+async function gAllSelfBountiesSellerForBuyer(ethereumProvider, account) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getAllSelfBountiesSellerForBuyer(account);
+  return result;
+}
+
+async function getAllAvailableBounties(ethereumProvider, account) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getAllAvailableBounties(account);
+  return result;
+}
+
+// DNP SELF SETTERS
 
 // DAI CALLs
 async function getDAIContract(ethereumProvider) {
@@ -107,4 +148,9 @@ export {
   gSelfBountyAmount,
   gAllSelfBountiesSold,
   gAllSearchBountiesBuy,
+  gAllSelfBountiesSellerForBuyer,
+  stopStreamSelfBounty,
+  DNP,
+  registerSearchBounty,
+  getAllAvailableBounties,
 };

@@ -37,7 +37,6 @@ export default function Register() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
-    localStorage.setItem('eth_address', account0);
   }, []);
 
   async function submitInfosToServer() {

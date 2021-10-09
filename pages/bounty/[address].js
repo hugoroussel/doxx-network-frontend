@@ -11,7 +11,7 @@ import router, { useRouter } from 'next/router';
 import Blockies from 'react-blockies';
 import { ExternalLinkIcon } from '@heroicons/react/outline';
 import Navbar from '../../components/navbar';
-import { approveDAI, buySelfBounty } from '../../customHooks/contracts';
+import { approveDAI, buySelfBounty, DNP} from '../../customHooks/contracts';
 import { validateEmail } from '../../utils/utils';
 
 export default function Register() {
@@ -77,7 +77,7 @@ export default function Register() {
                 <div className="pt-5">
 
                   <label htmlFor="email" className="block text-xl font-medium text-white y-4">
-                    The address you are purchasing
+                    Purchase this Address Details :
                   </label>
                   <div className="pt-5 text-white text-lg align-items-center text-center">
                     <Blockies
@@ -133,7 +133,7 @@ export default function Register() {
                     />
                   </div>
                   <p className="mt-2 text-md text-gray-50" id="email-description">
-                    This amount will be streamed during a week. You can withdraw it at any time during this period.
+                    This amount will be streamed during a week. You can stop it at any time.
                   </p>
                 </div>
 
@@ -153,7 +153,7 @@ export default function Register() {
                   </div>
                   {validEmail ? (
                     <p className="mt-2 text-md text-gray-50" id="email-description">
-                      You will receive the bounty details in your email.
+                      You will receive the address details at this mail.
                     </p>
                   ) : (
                     <p className="mt-2 text-md text-red-500" id="email-description">

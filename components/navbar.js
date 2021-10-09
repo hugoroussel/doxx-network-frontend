@@ -12,7 +12,7 @@ import { MenuIcon, XIcon } from '@heroicons/react/outline';
 const navigation = [
   { name: 'My Account', href: '/account', current: true },
   { name: 'Explore', href: '/search', current: false },
-  { name: 'Check my Address', href: '#', current: false },
+  { name: 'Check my Address', href: '/check', current: false },
 ];
 
 function classNames(...classes) {

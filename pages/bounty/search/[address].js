@@ -72,7 +72,7 @@ export default function Register() {
 
     console.log('payload', payload);
 
-    axios.post(`${process.env.SERVER_IP}/buy_search`, payload);
+    axios.post(`https://${process.env.SERVER_IP}/buy_search`, payload);
     setProgress([
       {
         id: 'Step 1', name: 'Signature', href: handleSign, status: 'done',
@@ -84,7 +84,7 @@ export default function Register() {
 
   async function getBounty(buyer, seller) {
     const payload = { buyer, seller };
-    const res = await axios.post(`${process.env.SERVER_IP}/get_search_bounty`, payload);
+    const res = await axios.post(`https://${process.env.SERVER_IP}/get_search_bounty`, payload);
     console.log('The bounty is', res.data);
     setBounty(res.data[res.data.length - 1]);
   }

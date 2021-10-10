@@ -37,7 +37,7 @@ export default function Check() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     const payload = { address: account0 };
-    const res = await axios.post(`${process.env.SERVER_IP}/search_bounties`, payload);
+    const res = await axios.post(`https://${process.env.SERVER_IP}/search_bounties`, payload);
     console.log('this is the data', res.data);
     setBounties(res.data);
   }

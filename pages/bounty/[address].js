@@ -31,7 +31,7 @@ export default function Register() {
 
     const { address } = pageRouter.query;
     setSellerAddress(address);
-    const res = await axios.post(`${process.env.SERVER_IP}/bounty`, { address });
+    const res = await axios.post(`https://${process.env.SERVER_IP}/bounty`, { address });
     console.log(res);
     setBounty(res.data[0]);
     if (window.ethereum === undefined) {
@@ -63,7 +63,7 @@ export default function Register() {
     const payload = {
       sellerAddress: sa, buyerAddress: account0, buyerEmail, txHash,
     };
-    await axios.post(`${process.env.SERVER_IP}/buyself`, payload);
+    await axios.post(`https://${process.env.SERVER_IP}/buyself`, payload);
     setOpen(true);
   }
 
@@ -103,7 +103,7 @@ export default function Register() {
     const { address } = pageRouter.query;
     setSellerAddress(address);
     localStorage.setItem('sellerAddress', address);
-    const res = await axios.post(`${process.env.SERVER_IP}/bounty`, { address });
+    const res = await axios.post(`https://${process.env.SERVER_IP}/bounty`, { address });
     console.log(res);
     setBounty(res.data[0]);
     if (window.ethereum === undefined) {

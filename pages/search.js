@@ -120,7 +120,7 @@ export default function Register() {
       email, seller, amount, about, buyer: account0, signature,
     };
 
-    const res = await axios.post(`${process.env.SERVER_IP}/register_search`, payload);
+    const res = await axios.post(`https://${process.env.SERVER_IP}/register_search`, payload);
     console.log(res);
 
     setProgress([

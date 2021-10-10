@@ -38,7 +38,7 @@ export default function Home() {
       setBrowserSupported(false);
     }
     try {
-      const feedres = await axios.get(`${process.env.SERVER_IP}/feed`);
+      const feedres = await axios.get(`https://${process.env.SERVER_IP}/feed`);
       setFeed(feedres.data);
     } catch (err) {
       console.log(err);

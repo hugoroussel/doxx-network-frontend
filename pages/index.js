@@ -29,7 +29,7 @@ export default function Home() {
       setBrowserSupported(false);
     }
     try {
-      const feedres = await axios.get('http://localhost:8081/feed');
+      const feedres = await axios.get(`${process.env.SERVER_IP}/feed`);
       setFeed(feedres.data);
     } catch (err) {
       console.log(err);

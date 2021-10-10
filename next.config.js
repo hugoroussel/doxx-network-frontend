@@ -5,4 +5,7 @@ module.exports = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  env: {
+    SERVER_IP: process.env.SERVER_IP,
+  },
 };

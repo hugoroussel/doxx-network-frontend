@@ -72,7 +72,7 @@ export default function Register() {
     const data = {
       email, address: account0, signature, about, amount,
     };
-    await axios.post('http://localhost:8081/registerself', data);
+    await axios.post(`${process.env.SERVER_IP}/registerself`, data);
     setStep2(true);
     setProgress([
       {

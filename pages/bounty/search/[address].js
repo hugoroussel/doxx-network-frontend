@@ -9,7 +9,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import router, { useRouter } from 'next/router';
 import Blockies from 'react-blockies';
-import { ExternalLinkIcon } from '@heroicons/react/outline';
+import { ExternalLinkIcon, CheckIcon } from '@heroicons/react/outline';
+import { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import Navbar from '../../../components/navbar';
 import {
   approveDAI, buySelfBounty, DNP, getSignature, buySearchBounty,
@@ -21,6 +23,7 @@ export default function Register() {
   const [bounty, setBounty] = useState([]);
   const [account, setAccount] = useState('');
   const [validEmail, setValidEmail] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const [progress, setProgress] = useState([
     {
@@ -36,6 +39,7 @@ export default function Register() {
     const account0 = accounts[0];
     const buyerAddress = localStorage.getItem('buyer');
     await buySearchBounty(window.ethereum, account0, buyerAddress);
+    setOpen(true);
   }
 
   async function handleSign() {
@@ -68,7 +72,7 @@ export default function Register() {
 
     console.log('payload', payload);
 
-    axios.post('http://localhost:8081/buy_search', payload);
+    axios.post(`${process.env.SERVER_IP}/buy_search`, payload);
     setProgress([
       {
         id: 'Step 1', name: 'Signature', href: handleSign, status: 'done',
@@ -80,7 +84,7 @@ export default function Register() {
 
   async function getBounty(buyer, seller) {
     const payload = { buyer, seller };
-    const res = await axios.post('http://localhost:8081/get_search_bounty', payload);
+    const res = await axios.post(`${process.env.SERVER_IP}/get_search_bounty`, payload);
     console.log('The bounty is', res.data);
     setBounty(res.data[res.data.length - 1]);
   }
@@ -105,6 +109,82 @@ export default function Register() {
     <div className="relative bg-gray-800 overflow-hidden h-screen">
       <div className="relative pt-6 pb-16 sm:pb-24">
         <Navbar />
+
+        <Transition.Root show={open} as={Fragment}>
+          <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+              </Transition.Child>
+
+              {/* This element is to trick the browser into centering the modal contents. */}
+              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+                &#8203;
+              </span>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+                  <div>
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                      <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                        Registering Successful
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          You will receive a confirmation email shortly.
+                        </p>
+                        <br />
+
+                        <a
+                          className="twitter-share-button"
+                          href="https://twitter.com/intent/tweet?text=I just claimed a bounty on my address on Doxx.Network! Come check out doxx.network"
+                          data-size="large"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Tweet About It!
+                        </a>
+                        <img
+                          className="h-6 inline-block px-2 pb-1"
+                          src="https://upload.wikimedia.org/wikipedia/de/thumb/9/9f/Twitter_bird_logo_2012.svg/944px-Twitter_bird_logo_2012.svg.png"
+                          alt="twitter"
+                        />
+
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-5 sm:mt-6">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                      onClick={() => router.push('/')}
+                    >
+                      Go back to dashboard
+                    </button>
+                  </div>
+                </div>
+              </Transition.Child>
+            </div>
+          </Dialog>
+        </Transition.Root>
 
         <main className="sm:mt-24">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 justify-items-center rounded-lg bg-gray-800">

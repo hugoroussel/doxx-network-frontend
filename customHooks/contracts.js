@@ -87,6 +87,18 @@ async function registerSearchBounty(ethereumProvider, bounty, seller, buyer) {
   console.log(txHash);
 }
 
+async function buySearchBounty(ethereumProvider, seller, buyer) {
+  const dn = await getDNPContract(ethereumProvider);
+  const res = await dn.populateTransaction.buySearchBounty(seller, buyer);
+  res.from = seller;
+  res.chainId = 5;
+  const txHash = await ethereumProvider.request({
+    method: 'eth_sendTransaction',
+    params: [res],
+  });
+  return txHash;
+}
+
 // DNP GETTERS
 
 async function isApprovedSeller(ethereumProvider, sellerAddress) {
@@ -168,4 +180,5 @@ export {
   registerSearchBounty,
   getAllAvailableBounties,
   getSearchBountyAmount,
+  buySearchBounty,
 };

@@ -13,6 +13,7 @@
 /* This example requires Tailwind CSS v2.0+ */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import router from 'next/router';
 import {
   gAllSearchBountiesBuy, gAllSelfBountiesSold, gSelfBountyAmount,
   isApprovedSeller, gAllSelfBountiesSellerForBuyer,
@@ -29,33 +30,41 @@ export default function Register() {
   const [totalSold, setTotalSold] = useState(0);
   const [totalSearching, setTotalSearching] = useState([]);
   const [totalStreamsStarted, setTotalStreamsStarted] = useState([]);
+  const [bounties, setBounties] = useState([]);
+
+  async function getSearchBounties() {
+    console.log('Looking for search bounties');
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account0 = accounts[0];
+    const payload = { address: account0 };
+    const res = await axios.post('http://localhost:8081/search_bounties', payload);
+    console.log('this is the data', res.data);
+    setBounties(res.data);
+  }
 
   useEffect(async () => {
     if (!window.ethereum) {
-      setNoEthereum(true);
+      alert('Please install MetaMask to use this dApp');
       return;
     }
-    const address = localStorage.getItem('eth_address');
-    console.log('this is the address', address);
-    if (address === '') {
-      const aa = await getAccount();
-      setAccountAddress(aa);
-    } else {
-      setAccountAddress(address);
-      const res = await isApprovedSeller(window.ethereum, address);
-      console.log('this is the res', res);
-      setVerified(res);
-      const ba = await gSelfBountyAmount(window.ethereum, address);
-      setBountyAmount(parseInt(ba._hex, 16) / 1e18);
-      const ts = await gAllSelfBountiesSold(window.ethereum, address);
-      console.log('this is the ts', ts);
-      setTotalSold(ts.length);
-      const tsf = await gAllSearchBountiesBuy(window.ethereum, address);
-      setTotalSearching(tsf);
-      const tss = await gAllSelfBountiesSellerForBuyer(window.ethereum, address);
-      setTotalStreamsStarted(tss);
-      console.log('this is the tss', tss, tss.length);
-    }
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const address = accounts[0];
+    setAccountAddress(address);
+    console.log('this is triggered');
+    const res = await isApprovedSeller(window.ethereum, address);
+    console.log('this is the res', res);
+    setVerified(res);
+    await getSearchBounties();
+    const ba = await gSelfBountyAmount(window.ethereum, address);
+    setBountyAmount(parseInt(ba._hex, 16) / 1e18);
+    const ts = await gAllSelfBountiesSold(window.ethereum, address);
+    console.log('this is the ts', ts);
+    setTotalSold(ts.length);
+    const tsf = await gAllSearchBountiesBuy(window.ethereum, address);
+    setTotalSearching(tsf);
+    const tss = await gAllSelfBountiesSellerForBuyer(window.ethereum, address);
+    setTotalStreamsStarted(tss);
+    console.log('this is the tss', tss, tss.length);
   }, []);
 
   async function handleStopStream(seller, buyer) {
@@ -126,6 +135,63 @@ export default function Register() {
                             onClick={(e) => { e.preventDefault(); handleStopStream(item, accountAddress); }}
                           >
                             Stop Stream
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                </div>
+              </div>
+            </div>
+            <br />
+
+            <div className="mt-5 sm:mt-24 lg:mt-0 lg:col-span-4">
+              <div className="sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden bg-gradient-to-tr from-purple-700 to-indigo-400">
+                <div className="px-4 py-8 sm:px-10">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white text-center">
+                      People looking for you :
+                      {' '}
+                      {bounties.length}
+                    </h2>
+                  </div>
+
+                  {bounties.length === 0 ? (<p className="text-white text-center">Did not find any bounties</p>) : (
+                    <ul role="list" className="space-y-3 py-2">
+                      {bounties.map((item, itemIdx) => (
+                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500">
+                          <p className="text-md text-left">
+                            Bounty
+                            {' '}
+                            {itemIdx + 1}
+                          </p>
+                          <p className="text-md py-2">
+                            About :
+                            {' '}
+                            {item.about}
+                          </p>
+                          <div className="text-md py-2 inline-block">
+                            Price :
+                            {' '}
+                            {item.amount}
+                            <img
+                              className="h-6 px-2 pb-1 inline-block"
+                              src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
+                              alt="dai logo"
+                            />
+                          </div>
+
+                          <p className="text-xs py-2 inline-block">
+                            Buyer :
+                            {' '}
+                            {item.buyer}
+                          </p>
+                          <button
+                            className="btn-secondary"
+                            onClick={(e) => { e.preventDefault(); router.push(`/bounty/search/${item.buyer}`); }}
+                          >
+                            Buy
                           </button>
                         </li>
                       ))}

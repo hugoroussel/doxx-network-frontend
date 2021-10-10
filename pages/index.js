@@ -36,15 +36,6 @@ export default function Home() {
     }
   }, []);
 
-  const items = [
-    { id: 1 },
-    { id: 1 },
-    { id: 1 },
-    { id: 1 },
-    { id: 1 },
-    // More items...
-  ];
-
   useEffect(() => {}, [feed]);
 
   return (

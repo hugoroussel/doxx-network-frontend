@@ -88,7 +88,6 @@ export default function Register() {
     console.log('Ethereum address', account);
     if (window.ethereum === undefined) {
       alert('No Metamask Detected');
-      setNoEthereum(true);
       return;
     }
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });

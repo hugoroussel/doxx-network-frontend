@@ -10,9 +10,8 @@ import { Popover, Transition } from '@headlessui/react';
 import { MenuIcon, XIcon } from '@heroicons/react/outline';
 
 const navigation = [
-  { name: 'My Account', href: '/account', current: true },
+  { name: 'My Address', href: '/account', current: true },
   { name: 'Explore', href: '/search', current: false },
-  { name: 'Check my Address', href: '/check', current: false },
 ];
 
 export default function Navbar() {
@@ -34,7 +33,7 @@ export default function Navbar() {
                   <MenuIcon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
               </div>
-            </div>
+            </div> 
             <div className="hidden space-x-10 md:flex md:ml-10">
               {navigation.map((item) => (
                 <a key={item.name} href={item.href} className="pt-3 font-medium text-white hover:text-gray-300">
@@ -42,14 +41,6 @@ export default function Navbar() {
                 </a>
               ))}
             </div>
-          </div>
-          <div className="hidden md:flex">
-            <a
-              href="#"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700"
-            >
-              Metamask
-            </a>
           </div>
         </nav>
 
@@ -91,12 +82,6 @@ export default function Navbar() {
                   </a>
                 ))}
               </div>
-              <a
-                href="#"
-                className="block w-full px-5 py-3 text-center font-medium text-white hover:text-gray-400"
-              >
-                Metamask
-              </a>
             </div>
           </Popover.Panel>
         </Transition>

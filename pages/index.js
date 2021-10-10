@@ -13,7 +13,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Blockies from 'react-blockies';
 import router from 'next/router';
+import {
+  RefreshIcon, CalendarIcon, LoginIcon, TruckIcon, SearchCircleIcon, CurrencyDollarIcon,
+} from '@heroicons/react/outline';
 import Navbar from '../components/navbar.js';
+
+const perks = [
+  { name: '10-year all-inclusive warranty', description: 'We’ll replace it with a new one', icon: CalendarIcon },
+  { name: 'Free shipping on returns', description: 'Send it back for free', icon: RefreshIcon },
+  { name: 'Free, contactless delivery', description: 'The shipping is on us', icon: TruckIcon },
+];
 
 export default function Home() {
   const [browserSupported, setBrowserSupported] = useState(true);
@@ -79,17 +88,19 @@ export default function Home() {
                   </div>
                   <p className="mt-8 text-sm text-white uppercase tracking-wide font-semibold sm:mt-10">Made With</p>
                   <div className="mt-5 w-full sm:mx-auto sm:max-w-lg lg:ml-0">
-                    <div className="flex flex-wrap items-start justify-between">
-                      <div className="flex justify-center px-1">
+
+                    <div className="flex flex-wrap items-start justify-between y-1">
+                      <div className="flex justify-center bg-white rounded-md p-1">
                         <img
-                          className="h-24 sm:h-10"
+                          className="h-14 sm:h-10 "
                           src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/xhwcodrzvkpktyzwfjjw"
                           alt="Tuple"
                         />
                       </div>
-                      <div className="flex justify-center px-1">
+                      <div className="flex justify-center bg-white rounded-md p-1">
                         <img
-                          className="h-9 sm:h-10"
+                          className="h-11 sm:h-10 "
+                          src="https://polygon.technology/wp-content/uploads/2021/07/polygon-logo.svg"
                         />
                       </div>
                       <div className="flex justify-center px-1" />
@@ -147,7 +158,52 @@ export default function Home() {
               </div>
 
             </div>
+
+            <br />
+            <br />
+            <br />
+            <br />
+
+            <div className="bg-gray-800">
+              <h2 className="sr-only">How does it work?</h2>
+              <div className="max-w-7xl mx-auto divide-y divide-gray-200 lg:py-8 lg:flex lg:justify-center lg:divide-y-0 lg:divide-x">
+                <div className="py-8 lg:py-0 lg:w-1/3 lg:flex-none">
+                  <div className="max-w-xs mx-auto px-4 flex items-center lg:max-w-none lg:px-8">
+                    <div className="ml-4 flex-auto flex flex-col-reverse">
+                      <h3 className="font-medium text-white">Input your email, your bounty amount and sign your Ethereum Address. </h3>
+                      <p className="text-xl text-gray-100">Register your Address</p>
+                    </div>
+                    <LoginIcon
+                      className="flex-shrink-0 h-12 w-12 text-white"
+                    />
+                  </div>
+                </div>
+                <div className="py-8 lg:py-0 lg:w-1/3 lg:flex-none">
+                  <div className="max-w-xs mx-auto px-4 flex items-center lg:max-w-none lg:px-8">
+                    <div className="ml-4 flex-auto flex flex-col-reverse">
+                      <h3 className="font-medium text-white">Put a bounty on a specific address to try to find them.</h3>
+                      <p className="text-xl text-gray-100">Search</p>
+                    </div>
+                    <SearchCircleIcon
+                      className="flex-shrink-0 h-12 w-12 text-white"
+                    />
+                  </div>
+                </div>
+                <div className="py-8 lg:py-0 lg:w-1/3 lg:flex-none">
+                  <div className="max-w-xs mx-auto px-4 flex items-center lg:max-w-none lg:px-8">
+                    <div className="ml-4 flex-auto flex flex-col-reverse">
+                      <h3 className="font-medium text-white">If a bounty is claimed a DAI stream will automatically start.</h3>
+                      <p className="text-xl text-gray-100">Get Paid</p>
+                    </div>
+                    <CurrencyDollarIcon
+                      className="flex-shrink-0 h-12 w-12 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+
         </main>
         <br />
         <br />

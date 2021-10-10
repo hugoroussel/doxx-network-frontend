@@ -7,5 +7,6 @@ module.exports = {
   },
   env: {
     SERVER_IP: process.env.SERVER_IP,
+    CHAIN_ID: process.env.CHAIN_ID,
   },
 };

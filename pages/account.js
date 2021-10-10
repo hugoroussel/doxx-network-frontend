@@ -17,13 +17,12 @@ import router from 'next/router';
 import {
   gAllSearchBountiesBuy, gAllSelfBountiesSold, gSelfBountyAmount,
   isApprovedSeller, gAllSelfBountiesSellerForBuyer,
-  stopStreamSelfBounty,
+  stopStreamSelfBounty, getAllSearchBountiesForBuyer,
 } from '../customHooks/contracts.js';
 import Navbar from '../components/navbar.js';
 import { getAccount } from '../utils/ethereum';
 
 export default function Register() {
-  const [noEthereum, setNoEthereum] = useState(false);
   const [verified, setVerified] = useState(false);
   const [accountAddress, setAccountAddress] = useState('');
   const [bountyAmount, setBountyAmount] = useState(0);
@@ -31,6 +30,7 @@ export default function Register() {
   const [totalSearching, setTotalSearching] = useState([]);
   const [totalStreamsStarted, setTotalStreamsStarted] = useState([]);
   const [bounties, setBounties] = useState([]);
+  const [searchStreams, setSearchStreams] = useState([]);
 
   async function getSearchBounties() {
     console.log('Looking for search bounties');
@@ -65,6 +65,8 @@ export default function Register() {
     const tss = await gAllSelfBountiesSellerForBuyer(window.ethereum, address);
     setTotalStreamsStarted(tss);
     console.log('this is the tss', tss, tss.length);
+    const ss = await getAllSearchBountiesForBuyer(window.ethereum, address);
+    setSearchStreams(ss);
   }, []);
 
   async function handleStopStream(seller, buyer) {
@@ -77,7 +79,7 @@ export default function Register() {
         <Navbar />
 
         <main className="sm:mt-24">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 justify-items-center rounded-lg bg-gray-800">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 justify-items-center rounded-lg bg-gray-800">
 
             <div className="mt-5 sm:mt-24 lg:mt-0 lg:col-span-4">
               <div className="sm:max-w-md sm:w-full sm:mx-auto sm:rounded-lg sm:overflow-hidden bg-gradient-to-tr from-purple-700 to-indigo-400">
@@ -95,10 +97,22 @@ export default function Register() {
                       {verified
                         ? (
                           <div>
-                            You are a verified seller
+                            You are a Verified Seller
                           </div>
                         )
-                        : (<div>Register your account now</div>)}
+                        : (
+                          <div>
+
+                            <button
+                              type="button"
+                              className="inline-flex items-center px-6 py-3 text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-b from-purple-700 to-indigo-400  hover:from-pink-500 hover:to-yellow-500 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              onClick={() => { router.push('/register'); }}
+                            >
+                              Register Now
+                            </button>
+
+                          </div>
+                        )}
 
                     </li>
 
@@ -119,16 +133,57 @@ export default function Register() {
                     <h2 className="text-md font-bold text-white text-center">Stop the stream here if the person never replied :(</h2>
                   </div>
 
+                  <p
+                    className="text-white py-2"
+                  >
+                    Current Streams
+                  </p>
+
                   {totalStreamsStarted.length === 0 ? (<p className="text-white text-center">You bought 0 addresses details</p>) : (
                     <ul role="list" className="space-y-3 py-2">
                       {totalStreamsStarted.map((item, itemIdx) => (
-                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500">
+                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500 border-dashed">
                           <p className="text-md text-left">
                             Stream
                             {' '}
                             {itemIdx + 1}
                           </p>
-                          <p className="text-xs py-2">{item}</p>
+                          <p className="text-xs py-2">
+                            To :
+                            {' '}
+                            {item}
+                          </p>
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={(e) => { e.preventDefault(); handleStopStream(item, accountAddress); }}
+                          >
+                            Stop Stream
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  <p
+                    className="text-white py-2"
+                  >
+                    Your Bounties
+                  </p>
+                  {searchStreams.length === 0 ? (<p className="text-white text-center">You put</p>) : (
+                    <ul role="list" className="space-y-3 py-2">
+                      {searchStreams.map((item, itemIdx) => (
+                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500 border-dashed">
+                          <p className="text-md text-left">
+                            Stream
+                            {' '}
+                            {itemIdx + 1}
+                          </p>
+                          <p className="text-xs py-2">
+                            To :
+                            {' '}
+                            {item}
+                          </p>
                           <button
                             type="button"
                             className="btn-secondary"
@@ -160,19 +215,15 @@ export default function Register() {
                   {bounties.length === 0 ? (<p className="text-white text-center">Did not find any bounties</p>) : (
                     <ul role="list" className="space-y-3 py-2">
                       {bounties.map((item, itemIdx) => (
-                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500">
+                        <li className="text-white text-center py-2 p-2 border-2 rounded-lg border-red-500 border-dashed">
                           <p className="text-md text-left">
                             Bounty
                             {' '}
                             {itemIdx + 1}
-                          </p>
-                          <p className="text-md py-2">
-                            About :
                             {' '}
-                            {item.about}
-                          </p>
-                          <div className="text-md py-2 inline-block">
-                            Price :
+                            {' '}
+                            :
+                            {' '}
                             {' '}
                             {item.amount}
                             <img
@@ -180,8 +231,7 @@ export default function Register() {
                               src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
                               alt="dai logo"
                             />
-                          </div>
-
+                          </p>
                           <p className="text-xs py-2 inline-block">
                             Buyer :
                             {' '}
@@ -191,7 +241,7 @@ export default function Register() {
                             className="btn-secondary"
                             onClick={(e) => { e.preventDefault(); router.push(`/bounty/search/${item.buyer}`); }}
                           >
-                            Buy
+                            Checkout Bounty
                           </button>
                         </li>
                       ))}

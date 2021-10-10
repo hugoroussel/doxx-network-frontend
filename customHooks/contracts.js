@@ -40,7 +40,7 @@ async function registerSelfBounty(amount, ethereumProvider, account) {
   const bn = new BigNumber(amount * 1e18);
   const res = await dn.populateTransaction.registerSelfBounty(bn.toFixed());
   res.from = account;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -52,7 +52,7 @@ async function buySelfBounty(ethereumProvider, seller, account) {
   const dn = await getDNPContract(ethereumProvider);
   const res = await dn.populateTransaction.buySelfBounty(seller, account);
   res.from = account;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -64,7 +64,7 @@ async function stopStreamSelfBounty(ethereumProvider, seller, account) {
   const dn = await getDNPContract(ethereumProvider);
   const res = await dn.populateTransaction.stopStreamSelfBounty(seller, account);
   res.from = account;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -79,7 +79,7 @@ async function registerSearchBounty(ethereumProvider, bounty, seller, buyer) {
   const bn = new BigNumber(bounty * 1e18);
   const res = await dn.populateTransaction.registerSearchBounty(bn.toFixed(), seller);
   res.from = buyer;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -91,7 +91,7 @@ async function buySearchBounty(ethereumProvider, seller, buyer) {
   const dn = await getDNPContract(ethereumProvider);
   const res = await dn.populateTransaction.buySearchBounty(seller, buyer);
   res.from = seller;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -131,6 +131,12 @@ async function gAllSelfBountiesSellerForBuyer(ethereumProvider, account) {
   return result;
 }
 
+async function getAllSearchBountiesForBuyer(ethereumProvider, account) {
+  const dn = await getDNPContract(ethereumProvider);
+  const result = await dn.getAllSearchBountiesBuy(account);
+  return result;
+}
+
 async function getAllAvailableBounties(ethereumProvider, account) {
   const dn = await getDNPContract(ethereumProvider);
   const result = await dn.getAllAvailableBounties(account);
@@ -158,7 +164,7 @@ async function approveDAI(amount, ethereumProvider, account) {
   const bn = new BigNumber(amount * 1e18);
   const res = await dai.populateTransaction.approve(DNP, bn.toFixed());
   res.from = account;
-  res.chainId = 5;
+  res.chainId = parseInt(process.env.CHAIN_ID, 10);
   const txHash = await ethereumProvider.request({
     method: 'eth_sendTransaction',
     params: [res],
@@ -181,4 +187,5 @@ export {
   getAllAvailableBounties,
   getSearchBountyAmount,
   buySearchBounty,
+  getAllSearchBountiesForBuyer,
 };

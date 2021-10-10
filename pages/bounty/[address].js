@@ -345,6 +345,11 @@ export default function Register() {
           </div>
 
         </main>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
       </div>
     </div>
 

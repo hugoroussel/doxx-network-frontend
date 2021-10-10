@@ -22,8 +22,6 @@ module.exports = {
       '/check': { page: '/check' },
       '/register': { page: '/register' },
       '/search': { page: '/search' },
-      '/bounty': { page: '/bounty' },
-      '/bounty/search': { page: '/bounty/search' },
     };
     return paths;
   },

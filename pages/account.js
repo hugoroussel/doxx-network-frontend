@@ -92,37 +92,7 @@ export default function Register() {
                         : (<div>Register your account now</div>)}
 
                     </li>
-                    <li className="text-white text-center">
-                      {verified
-                        ? (
-                          <div className="items-center py-2">
-                            <p className="inline-block">
-                              Bounty Amount :
-                              {' '}
-                              {bountyAmount}
-                            </p>
-                            <img
-                              className="h-6 pl-2 inline-block"
-                              src="https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png?v=013"
-                              alt="dai logo"
-                            />
-                          </div>
-                        )
-                        : (<div>Register your account now</div>)}
-                    </li>
-                    <li className="text-white text-center">
-                      {verified
-                        ? (
-                          <div className="items-center">
-                            <p className="inline-block">
-                              Number of times you sold your address :
-                              {' '}
-                              {totalSold}
-                            </p>
-                          </div>
-                        )
-                        : (<div>Register your account now</div>)}
-                    </li>
+
                   </ul>
                 </div>
               </div>

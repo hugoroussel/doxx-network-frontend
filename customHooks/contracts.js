@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import dnpAbi from '../abis/dnp.js';
 import erc20Abi from '../abis/erc20.js';
 
-const DNP = '0x06ccECB4Ca0634caF76ca1F1CBE5ee3316AD04e4';
+const DNP = '0x2BCaf26109197e6695B88B4b693eb2E9D1A53334';
 const DAI = '0x88271d333C72e51516B67f5567c728E702b3eeE8';
 
 function hexToInt(hexstring) {

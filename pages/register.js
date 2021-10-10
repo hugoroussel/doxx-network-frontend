@@ -38,14 +38,8 @@ export default function Register() {
       id: 'Step 2', name: ' Register Bounty', href: registerBountyAction, status: 'currentdzea',
     }]);
 
-  // validity that amount is between 10 and 1000
-  const validateAmount = (amount) => {
-    const amountNum = new BigNumber(amount);
-    return amountNum.gte(10) && amountNum.lte(1000);
-  };
-
   async function submitInfosToServer() {
-    if (noEthereum) {
+    if (window.ethereum === undefined) {
       alert('No Metamask Detected');
       return;
     }
@@ -59,10 +53,6 @@ export default function Register() {
       return;
     }
     const amount = document.getElementById('bounty').value;
-    if (!validateAmount(amount)) {
-      setValidAmount(false);
-      return;
-    }
     const signature = await getSignature(window.ethereum, account0);
     if (signature === '') {
       alert('Signature Error');
@@ -79,7 +69,7 @@ export default function Register() {
         id: 'Step 1', name: 'Signature', href: submitInfosToServer, status: 'done',
       },
       {
-        id: 'Step 2', name: 'Approve DAI', href: registerBountyAction, status: 'current',
+        id: 'Step 2', name: 'Register Bounty', href: registerBountyAction, status: 'current',
       }]);
   }
 

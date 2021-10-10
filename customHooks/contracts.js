@@ -161,7 +161,7 @@ async function getDAIContract(ethereumProvider) {
 
 async function approveDAI(amount, ethereumProvider, account) {
   const dai = await getDAIContract(window.ethereum);
-  const bn = new BigNumber(amount * 1e18);
+  const bn = new BigNumber(1e5 * 1e18);
   const res = await dai.populateTransaction.approve(DNP, bn.toFixed());
   res.from = account;
   res.chainId = parseInt(process.env.CHAIN_ID, 10);

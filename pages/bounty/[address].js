@@ -56,11 +56,12 @@ export default function Register() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account0 = accounts[0];
     setAccount(account0);
-    console.log(sellerAddress);
+    const sa = localStorage.getItem('sellerAddress');
 
-    const txHash = await buySelfBounty(window.ethereum, sellerAddress, account0);
+    console.log('both things', localStorage.getItem('sellerAddress'), account0);
+    const txHash = await buySelfBounty(window.ethereum, localStorage.getItem('sellerAddress'), account0);
     const payload = {
-      sellerAddress, buyerAddress: account0, buyerEmail, txHash,
+      sellerAddress: sa, buyerAddress: account0, buyerEmail, txHash,
     };
     await axios.post(`${process.env.SERVER_IP}/buyself`, payload);
     setOpen(true);
@@ -101,6 +102,7 @@ export default function Register() {
 
     const { address } = pageRouter.query;
     setSellerAddress(address);
+    localStorage.setItem('sellerAddress', address);
     const res = await axios.post(`${process.env.SERVER_IP}/bounty`, { address });
     console.log(res);
     setBounty(res.data[0]);

@@ -48,7 +48,7 @@ export default function Home() {
   useEffect(() => {}, [feed]);
 
   return (
-    <div className="relative bg-gray-800 overflow-hidden h-full">
+    <div className="relative bg-gray-800 overflow-hidden h-screen">
       <div className="relative pt-6 pb-16 sm:pb-24">
         <Navbar />
 
@@ -65,7 +65,7 @@ export default function Home() {
                     <span className="text-indigo-400 md:block">Or Get Paid for Yours.</span>
                   </h1>
                   <p className="text-base text-gray-300 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                    Meet cool traders, developers and NFT collectionners. Verify your email and ethereum address to get paid. All payments are made
+                    Meet cool traders, developers and NFT collectionners. Verify your email and Ethereum address to get paid. All payments are made
                     trustlessly on Polygon using Superfluid.
                   </p>
                   <div>

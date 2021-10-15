@@ -33,7 +33,7 @@ export default function Navbar() {
                   <MenuIcon className="h-6 w-6" aria-hidden="true" />
                 </Popover.Button>
               </div>
-            </div> 
+            </div>
             <div className="hidden space-x-10 md:flex md:ml-10">
               {navigation.map((item) => (
                 <a key={item.name} href={item.href} className="pt-3 font-medium text-white hover:text-gray-300">

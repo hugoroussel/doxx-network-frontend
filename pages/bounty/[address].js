@@ -154,11 +154,11 @@ export default function Register() {
                     </div>
                     <div className="mt-3 text-center sm:mt-5">
                       <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                        Registering Successful
+                        Successful Purchase!
                       </Dialog.Title>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
-                          You will receive a confirmation email shortly.
+                          You will receive an email containing all details shortly!
                         </p>
                         <br />
 
